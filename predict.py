@@ -30,6 +30,8 @@ class Predictor(BasePredictor):
             result = self.model.transcribe(str(audio), batch_size=batch_size) 
             # result is dict w/keys ['segments', 'language']
             # segments is a list of dicts,each dict has {'text': <text>, 'start': <start_time_msec>, 'end': <end_time_msec> }
+            print("🔴 DEBUG LOGS MAXROOM")
+            print(result['segments'])
             if align_output:
                 # NOTE - the "only_text" flag makes no sense with this flag, but we'll do it anyway
                 result = whisperx.align(result['segments'], self.alignment_model, self.metadata, str(audio), self.device, return_char_alignments=False)
