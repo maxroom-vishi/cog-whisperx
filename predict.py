@@ -17,14 +17,26 @@ class Predictor(BasePredictor):
         self.model = whisperx.load_model("large-v2", self.device, language="en", compute_type=compute_type)
         self.alignment_model, self.metadata = whisperx.load_align_model(language_code="en", device=self.device)
 
-    def predict(
-        self,
-        audio: Path = Input(description="Audio file"),
-        batch_size: int = Input(description="Parallelization of input audio transcription", default=32),
-        align_output: bool = Input(description="Use if you need word-level timing and not just batched transcription", default=False),
-        only_text: bool = Input(description="Set if you only want to return text; otherwise, segment metadata will be returned as well.", default=False),
-        debug: bool = Input(description="Print out memory usage information.", default=False)
-    ) -> str:
+        def predict(self, segment: Dict = Input(description="Segment dictionary with text, start, and end times")):
+        # Extract values from segment
+        text = segment['text']
+        start_time = segment['start']
+        end_time = segment['end']
+
+        # Split text into words and calculate timestamps
+        words = text.split()
+        total_duration = end_time - start_time
+        duration_per_word = total_duration / len(words)
+
+        # Prepare word-level timestamps
+        word_timestamps = []
+        current_start = start_time
+        for word in words:
+            word_end = current_start + duration_per_word
+            word_timestamps.append({'word': word, 'start': current_start, 'end': word_end})
+            current_start = word_end
+
+        return word_timestamps -> str:
         """Run a single prediction on the model"""
         with torch.inference_mode():
             result = self.model.transcribe(str(audio), batch_size=batch_size) 
