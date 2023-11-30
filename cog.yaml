@@ -8,6 +8,7 @@ build:
 
   system_packages:
     - "ffmpeg"
+    - libsndfile1  # Add system packages required for torchaudio, if any
 
   # python version in the form '3.8' or '3.8.12'
   python_version: "3.11"
@@ -16,11 +17,10 @@ build:
   python_packages:
     - "torch==2.0"
     - "torchaudio==2.0.0"
-    - "git+https://github.com/m-bain/whisperX.git@befe2b242eb59dcd7a8a122d127614d5c63d36e9"
+    - numpy  # Add numpy if it's not already included
 
   run: 
     - "pip install ipython"
 
 predict: 'predict.py:Predictor'
-
-
+image: "r8.im/maxroom-vishi/cog-whisperx-dict-word-timestamps"
